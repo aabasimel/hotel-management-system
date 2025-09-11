@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +33,7 @@ public class RoomController {
     private final BookedRoomServiceImpl bookedRoomService;
 
     @PostMapping("/add/rooms")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<RoomResponse> addRooms(
             @RequestParam("photo") MultipartFile photo,
             @RequestParam("roomType") String roomType,
@@ -85,6 +87,7 @@ public class RoomController {
     }
 
     @DeleteMapping("/room/delete/{roomId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteRoom(@PathVariable UUID roomId) throws SQLException {
          roomService.deleteRoom(roomId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -92,6 +95,8 @@ public class RoomController {
     }
 
     @PutMapping("/update/{roomId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+
     public ResponseEntity<RoomResponse> updateRoom(@PathVariable UUID roomId,
                                                    @RequestParam(required = false)  String roomType,
                                                    @RequestParam(required = false) Double roomPrice,

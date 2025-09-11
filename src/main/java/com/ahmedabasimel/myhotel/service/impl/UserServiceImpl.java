@@ -18,9 +18,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
     @Override
     public User registerUser(User user) {
@@ -29,7 +29,8 @@ public class UserServiceImpl implements UserService {
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         System.out.println(user.getPassword());
-        Role userRole = roleRepository.findByName("ROLE_USER").get();
+        Role userRole = roleRepository.findByName("ROLE_USER")
+                .orElseThrow(() -> new RuntimeException("Role ROLE_USER not found in DB"));
         user.setRoles(Collections.singletonList(userRole));
         return userRepository.save(user);
     }

@@ -18,14 +18,13 @@ import java.util.List;
 
 @Component
 public class JwtUtils {
-
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-    @Value("${security.jwt.secret}")
+    @Value("${auth.token.jwtSecret}")
     private String jwtSecret;
 
-    @Value("${security.jwt.expirationTime}")
-    private int jwtExpirationTime;
+    @Value("${auth.token.expirationInMils}")
+    private int jwtExpirationMs;
 
     public String generateJwtTokenForUser(Authentication authentication){
         HotelUserDetails userPrincipal = (HotelUserDetails) authentication.getPrincipal();
@@ -36,24 +35,19 @@ public class JwtUtils {
                 .setSubject(userPrincipal.getUsername())
                 .claim("roles", roles)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime()+jwtExpirationTime))
+                .setExpiration(new Date((new Date()).getTime()+jwtExpirationMs))
                 .signWith(key(), SignatureAlgorithm.HS256).compact();
     }
 
     private Key key() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
-
     public String getUserNameFromToken(String token){
         return Jwts.parserBuilder()
                 .setSigningKey(key())
                 .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-
+                .parseClaimsJws(token).getBody().getSubject();
     }
-
     public boolean validateToken(String token){
         try{
             Jwts.parserBuilder().setSigningKey(key()).build().parse(token);
@@ -69,5 +63,6 @@ public class JwtUtils {
         }
         return false;
     }
+
 
 }

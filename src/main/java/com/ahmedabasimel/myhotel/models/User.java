@@ -16,6 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@Table(name = "users") // match your DB table name
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
